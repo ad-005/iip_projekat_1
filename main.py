@@ -33,10 +33,12 @@ class Client(commands.Bot):
 client = Client(command_prefix="!", intents=discord.Intents.all())
 
 @client.hybrid_command(name='sync', description='Sinhronizuje slash commande.')
+@commands.is_owner()
 async def sync(ctx: Context) -> None:
     await client.tree.sync(guild=ctx.guild)
     embed = discord.Embed(
-        description='Sinhronizovane slash komande za ovaj server.'
+        description='Sinhronizovane slash komande za ovaj server.',
+        color=discord.Colour.green()
     )
 
     await ctx.send(embed=embed)

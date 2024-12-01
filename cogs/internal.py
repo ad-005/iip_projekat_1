@@ -33,29 +33,51 @@ class Internal(commands.Cog, name="internal"):
         )
         await ctx.send(embed=embed)
 
-        @commands.hybrid_command(
-            name='load', description='Učitava odabrani Cog.'
-        )
-        @app_commands.describe(cog='Ime coga koji treba da se učita.')
-        @commands.is_owner()
-        async def load(ctx: Context, cog: str) -> None:
-            """
-            Učitava odabrani cog.
-            :param cog: Cog koji treba da se učita
-            :return: None
-            """
-            try:
-                await self.client.load_extension(f'cogs.{cog}')
-            except Exception as e:
-                embed = discord.Embed(
-                    title='Nije moguće učitati Cog.',
-                    description=str(e),
-                    colour=discord.Colour.red()
-                )
-                await ctx.send(embed=embed)
-
-            embed = discord.Embed(description='Cog uspješno učitan.', colour=discord.Colour.green())
+    @commands.hybrid_command(
+        name='load', description='Učitava odabrani Cog.'
+    )
+    @app_commands.describe(cog='Ime coga koji treba da se učita.')
+    @commands.is_owner()
+    async def load(self, ctx: Context, cog: str) -> None:
+        """
+        Učitava odabrani cog.
+        :param cog: Cog koji treba da se učita
+        :return: None
+        """
+        try:
+            await self.client.load_extension(f'cogs.{cog}')
+        except Exception as e:
+            embed = discord.Embed(
+                title='Nije moguće učitati Cog.',
+                description=str(e),
+                colour=discord.Colour.red()
+            )
             await ctx.send(embed=embed)
+
+        embed = discord.Embed(description='Cog uspješno učitan.', colour=discord.Colour.green())
+        await ctx.send(embed=embed)
+
+    @commands.hybrid_command(name='unload', description='Unloaduje odabrani Cog.')
+    @app_commands.describe(cog='Cog koji treba da se unloaduje.')
+    @commands.is_owner()
+    async def unload(self, ctx: Context, cog: str) -> None:
+        """
+        Unloaduje odabrani Cog.
+        :param cog: Cog koji treba unloadovati.
+        :return: None
+        """
+        try:
+            await self.client.unload_extension(f'cogs.{cog}')
+        except Exception as e:
+            embed = discord.Embed(title='Nije moguće unloadovati Cog.',
+                                  description=str(e),
+                                  colour=discord.Colour.red()
+                                  )
+            await ctx.send(embed=embed)
+
+        embed = discord.Embed(description='Cog uspješno unloadovan.', colour=discord.Colour.green())
+        await ctx.send(embed=embed)
+
 
 async def setup(client) -> None:
     await client.add_cog(Internal(client))
