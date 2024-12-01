@@ -3,20 +3,26 @@ from dotenv import load_dotenv
 import json
 
 import discord
-from discord.ext import commands, tasks
+from discord.ext import commands
 from discord.ext.commands import Context
 
 with open("config.json") as file:
     config = json.load(file)
 
 class Client(commands.Bot):
+    def __init__(self) -> None:
+        super().__init__(
+            command_prefix='!',
+            intents=discord.Intents.all()
+        )
+        self.config = config
+
     async def on_ready(self) -> None:
         """
         Stampa da je bot upaljen kada se uspjesno poveze sa Discordom.
         :return: None
         """
         print(f"Bot: {self.user} je povezan.")
-        self.config = config
         await self.load_cogs()
         await self.set_status()
 
@@ -43,7 +49,7 @@ class Client(commands.Bot):
         await self.change_presence(activity=discord.Game('Plaćaju mi minimalac.'))
 
 
-client = Client(command_prefix='!', intents=discord.Intents.all())
+client = Client()
 
 @client.hybrid_command(name='sync', description='Sinhronizuje slash commande.')
 @commands.is_owner()
