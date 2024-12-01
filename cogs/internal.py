@@ -34,7 +34,8 @@ class Internal(commands.Cog, name="internal"):
         await ctx.send(embed=embed)
 
     @commands.hybrid_command(
-        name='load', description='Učitava odabrani Cog.'
+        name='load',
+        description='Učitava odabrani Cog.'
     )
     @app_commands.describe(cog='Ime coga koji treba da se učita.')
     @commands.is_owner()
@@ -57,7 +58,10 @@ class Internal(commands.Cog, name="internal"):
         embed = discord.Embed(description='Cog uspješno učitan.', colour=discord.Colour.green())
         await ctx.send(embed=embed)
 
-    @commands.hybrid_command(name='unload', description='Unloaduje odabrani Cog.')
+    @commands.hybrid_command(
+        name='unload',
+        description='Unloaduje odabrani Cog.'
+    )
     @app_commands.describe(cog='Cog koji treba da se unloaduje.')
     @commands.is_owner()
     async def unload(self, ctx: Context, cog: str) -> None:

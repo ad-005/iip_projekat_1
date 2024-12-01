@@ -13,6 +13,7 @@ class Client(commands.Bot):
         """
         print(f"Bot: {self.user} je povezan.")
         await self.load_cogs()
+        await self.set_status()
 
     async def load_cogs(self) -> None:
         """
@@ -28,6 +29,13 @@ class Client(commands.Bot):
 
                 except Exception as e:
                     print(f"Cog {extension} nije ucitan.\nError: {e}")
+
+    async def set_status(self) -> None:
+        """
+        Postavlja status bota svaki put kada se uključi.
+        :return: None
+        """
+        await self.change_presence(activity=discord.Game('Plaćaju mi minimalac.'))
 
 
 client = Client(command_prefix="!", intents=discord.Intents.all())
