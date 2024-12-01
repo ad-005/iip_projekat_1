@@ -1,9 +1,13 @@
 import os
 from dotenv import load_dotenv
+import json
+
 import discord
 from discord.ext import commands, tasks
 from discord.ext.commands import Context
 
+with open("config.json") as file:
+    config = json.load(file)
 
 class Client(commands.Bot):
     async def on_ready(self) -> None:
@@ -12,6 +16,7 @@ class Client(commands.Bot):
         :return: None
         """
         print(f"Bot: {self.user} je povezan.")
+        self.config = config
         await self.load_cogs()
         await self.set_status()
 
@@ -25,10 +30,10 @@ class Client(commands.Bot):
                 extension = cog[:-3]
                 try:
                     await self.load_extension(f"cogs.{extension}")
-                    print(f"Ucitan Cog: {extension}")
+                    print(f"Učitan Cog: {extension}")
 
                 except Exception as e:
-                    print(f"Cog {extension} nije ucitan.\nError: {e}")
+                    print(f"Cog {extension} nije učitan.\nError: {e}")
 
     async def set_status(self) -> None:
         """
@@ -38,7 +43,7 @@ class Client(commands.Bot):
         await self.change_presence(activity=discord.Game('Plaćaju mi minimalac.'))
 
 
-client = Client(command_prefix="!", intents=discord.Intents.all())
+client = Client(command_prefix='!', intents=discord.Intents.all())
 
 @client.hybrid_command(name='sync', description='Sinhronizuje slash commande.')
 @commands.is_owner()
