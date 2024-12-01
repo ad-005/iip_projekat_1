@@ -33,7 +33,7 @@ class Client(commands.Bot):
                     print(f"Učitan Cog: {extension}")
 
                 except Exception as e:
-                    print(f"Cog {extension} nije učitan.\nError: {e}")
+                    print(f"Cog {extension} nije učitan.\nRazlog: {e}")
 
     async def set_status(self) -> None:
         """
@@ -48,6 +48,10 @@ client = Client(command_prefix='!', intents=discord.Intents.all())
 @client.hybrid_command(name='sync', description='Sinhronizuje slash commande.')
 @commands.is_owner()
 async def sync(ctx: Context) -> None:
+    """
+    Sinhronizuje sve slash komande samo za server u kojem je upotrijebljena ova komanda.
+    :return: None
+    """
     await client.tree.sync(guild=ctx.guild)
     embed = discord.Embed(
         description='Sinhronizovane slash komande za ovaj server.',
