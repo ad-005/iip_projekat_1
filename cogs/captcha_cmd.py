@@ -1,12 +1,40 @@
 import datetime
+from random import randrange
+import random
+import string
+
 from PIL import Image
 from io import BytesIO
 from captcha.image import ImageCaptcha
-import random
+
 import discord
 from discord import app_commands
 from discord.ext import commands
 from discord.ext.commands import Context
+
+
+class ImageVerification:
+    def __init__(self) -> None:
+        super().__init__()
+        self.captcha_text = ''
+
+    async def generate_captcha(self, ctx: Context):
+        captcha_source = string.ascii_uppercase + string.digits
+        captcha_text = ''.join(random.choice(captcha_source) for _ in range(randrange(5, 9)))
+        self.captcha_text = captcha_text
+
+        captcha_obj = ImageCaptcha(
+            width=400,
+            height=220,
+            font_sizes=(20, 25, 45, 50, 70)
+        )
+
+        captcha_image: BytesIO = captcha_obj.generate(captcha_text)
+        slika: Image = Image.open(captcha_image)
+        with BytesIO() as slika_bajt:
+            slika.save(slika_bajt, 'PNG')
+            slika_bajt.seek(0)
+            await ctx.reply(file=discord.File(fp=slika_bajt, filename='captcha.png'))
 
 
 class CaptchaChoice(discord.ui.View):
@@ -64,6 +92,7 @@ class Captcha(commands.Cog, name='captcha'):
         :param captcha_text: Tekst sa slike koji se mora podudarati sa slikom.
         :return: None
         """
+        verifikacija_slika = ImageVerification()
         buttons = CaptchaChoice()
         embed = discord.Embed(
             title='Odaberite način verifikacije',
@@ -74,7 +103,7 @@ class Captcha(commands.Cog, name='captcha'):
         await buttons.wait()
 
         if buttons.value == 'image':
-            await ctx.send("Image")
+            await verifikacija_slika.generate_captcha(ctx)
 
         elif buttons.value == 'audio':
             await ctx.send("Audio")
