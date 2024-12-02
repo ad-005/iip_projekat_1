@@ -46,7 +46,7 @@ class Client(commands.Bot):
         Postavlja status bota svaki put kada se uključi.
         :return: None
         """
-        await self.change_presence(activity=discord.Game('Plaćaju mi minimalac.'))
+        await self.change_presence(activity=discord.Game('😎'))
 
 
 client = Client()

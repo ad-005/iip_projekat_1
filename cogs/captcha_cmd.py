@@ -108,6 +108,16 @@ class Captcha(commands.Cog, name='captcha'):
         :param captcha_text: Tekst sa slike koji se mora podudarati sa slikom.
         :return: None
         """
+        verified_role = discord.utils.get(ctx.guild.roles, name='Verifikovan')
+        if verified_role in ctx.author.roles:
+            embed = discord.Embed(
+                title='Već ste verifikovani',
+                description='Ne možete se ponovo verifikovati.',
+                color=discord.Color.red()
+            )
+            await ctx.send(embed=embed)
+            return
+
         verifikacija_slika = ImageVerification()
         buttons = CaptchaChoice()
         embed = discord.Embed(
@@ -125,7 +135,6 @@ class Captcha(commands.Cog, name='captcha'):
             user_response = await self.client.wait_for('message', check=lambda message: message.author == ctx.author)
 
             if user_response.content == verifikacija_slika.captcha_text:
-                verified_role = discord.utils.get(ctx.guild.roles, name='Verifikovan')
                 embed = discord.Embed(
                     title='Verifikacija uspješna',
                     description='Sada možete koristiti sve komande.',
