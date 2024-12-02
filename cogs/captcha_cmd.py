@@ -1,8 +1,36 @@
 import datetime
+from PIL import Image
+from io import BytesIO
+from captcha.image import ImageCaptcha
+import random
 import discord
 from discord import app_commands
 from discord.ext import commands
 from discord.ext.commands import Context
+
+
+class CaptchaChoice(discord.ui.View):
+    def __init__(self) -> None:
+        super().__init__()
+        self.value = None
+
+    @discord.ui.button(label='Audio', style=discord.ButtonStyle.primary)
+    async def audio_captcha(
+            self, button: discord.ui.Button, interaction: discord.Interaction
+    ) -> None:
+            self.value = 'audio'
+            self.stop()
+
+    @discord.ui.button(label='Slika', style=discord.ButtonStyle.primary)
+    async def image_captcha(
+            self, interaction: discord.Interaction, button: discord.ui.Button
+    ) -> None:
+        embed = discord.Embed(title='Image')
+
+        await interaction.message.edit(embed=embed, view=None)
+
+        self.value = 'image'
+        self.stop()
 
 
 class Captcha(commands.Cog, name='captcha'):
@@ -31,13 +59,30 @@ class Captcha(commands.Cog, name='captcha'):
         description='Verifikuje korisnika i omogućava mu da koristi bota.'
     )
     @app_commands.describe(captcha_text='Tekst sa captcha slike.')
-    @commands.has_role("Verifikovan")
     async def captcha(self, ctx: Context, captcha_text: str=None) -> None:
         """
         :param captcha_text: Tekst sa slike koji se mora podudarati sa slikom.
         :return: None
         """
-        await ctx.send(captcha_text, tts=True)
+        buttons = CaptchaChoice()
+        embed = discord.Embed(
+            title='Odaberite način verifikacije',
+            description='Audio za audio verifikaciju, Slika za klasičnu captch-u.',
+            color=discord.Color.blurple()
+        )
+        message = await ctx.reply(embed=embed, view=buttons)
+        await buttons.wait()
+
+        if buttons.value == 'image':
+            await ctx.send("Image")
+
+        elif buttons.value == 'audio':
+            await ctx.send("Audio")
+
+        else:
+            pass
+
+
 
 async def setup(client) -> None:
     await client.add_cog(Captcha(client))
