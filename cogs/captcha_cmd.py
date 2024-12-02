@@ -18,11 +18,17 @@ class ImageVerification:
         super().__init__()
         self.captcha_text = ''
 
-    async def generate_captcha(self, ctx: Context):
+    async def generate_captcha(self, ctx: Context) -> None:
+        """
+        Generiše i šalje captcha sliku u kanal u kojem je pokrenuta komanda 'captcha'.
+        Nema parametre 'osim' context-a, sama generiše tekst za captch-u.
+        :return: None
+        """
         embed = discord.Embed(
             title='Captcha verifikacija',
-            description='Odgovorite tačnim sadržajem slike.',
-            color=discord.Color.blurple()
+            description='Odgovorite tačnim sadržajem iz slike.',
+            color=discord.Color.blurple(),
+            timestamp=datetime.datetime.now()
         )
 
         captcha_source = string.ascii_uppercase + string.digits
@@ -40,12 +46,14 @@ class ImageVerification:
         with BytesIO() as slika_bajt:
             slika.save(slika_bajt, 'PNG')
             slika_bajt.seek(0)
+            embed.set_image(url='attachment://captcha.png')
             await ctx.reply(
                 embed=embed,
                 file=discord.File(fp=slika_bajt, filename='captcha.png')
             )
 
 
+# UI elementi za captcha komandu (biranje audio ili image captche)
 class CaptchaChoice(discord.ui.View):
     def __init__(self) -> None:
         super().__init__()
@@ -85,9 +93,8 @@ class Captcha(commands.Cog, name='captcha'):
         embed = discord.Embed(
             title='Dobrodošli!',
             description=f'Dobrodošli na server {member.mention}!'
-                        f'\nDa biste započeli verifikaciju, iskoristite komandu `verifikuj`.',
-            color=discord.Color.dark_magenta(),
-            timestamp=datetime.datetime.now()
+                        f'\nDa biste započeli verifikaciju, iskoristite komandu `captcha`.',
+            color=discord.Color.blurple(),
         )
         await self.welcome_channel.send(embed=embed)
 
@@ -106,13 +113,40 @@ class Captcha(commands.Cog, name='captcha'):
         embed = discord.Embed(
             title='Odaberite način verifikacije',
             description='Audio za audio verifikaciju, Slika za klasičnu captch-u.',
-            color=discord.Color.blurple()
+            color=discord.Color.blurple(),
+            timestamp=datetime.datetime.now()
         )
-        message = await ctx.reply(embed=embed, view=buttons)
+        embed.set_image(url='attachment://captcha.jpg')
+        bot_mssg = await ctx.reply(embed=embed, view=buttons)
         await buttons.wait()
 
         if buttons.value == 'image':
             await verifikacija_slika.generate_captcha(ctx)
+            user_response = await self.client.wait_for('message', check=lambda message: message.author == ctx.author)
+
+            if user_response.content == verifikacija_slika.captcha_text:
+                verified_role = discord.utils.get(ctx.guild.roles, name='Verifikovan')
+                embed = discord.Embed(
+                    title='Verifikacija uspješna',
+                    description='Sada možete koristiti sve komande.',
+                    color=discord.Color.teal(),
+                    timestamp=datetime.datetime.now()
+                )
+                await ctx.reply(embed=embed)
+                await ctx.author.add_roles(
+                    verified_role,
+                    reason='Korisnik prošao captcha verifikaciju.'
+                )
+
+            else:
+                embed = discord.Embed(
+                    title='Verifikacija neuspješna',
+                    description='Odgovor se ne podudara sa slikom.'
+                                '\nPokušajte ponovo upotrebom komande `captcha`.',
+                    color=discord.Color.red(),
+                    timestamp=datetime.datetime.now()
+                )
+                await ctx.reply(embed=embed)
 
         elif buttons.value == 'audio':
             await ctx.send("Audio")
