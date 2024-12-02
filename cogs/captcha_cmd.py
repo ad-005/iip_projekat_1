@@ -19,6 +19,12 @@ class ImageVerification:
         self.captcha_text = ''
 
     async def generate_captcha(self, ctx: Context):
+        embed = discord.Embed(
+            title='Captcha verifikacija',
+            description='Odgovorite tačnim sadržajem slike.',
+            color=discord.Color.blurple()
+        )
+
         captcha_source = string.ascii_uppercase + string.digits
         captcha_text = ''.join(random.choice(captcha_source) for _ in range(randrange(5, 9)))
         self.captcha_text = captcha_text
@@ -34,7 +40,10 @@ class ImageVerification:
         with BytesIO() as slika_bajt:
             slika.save(slika_bajt, 'PNG')
             slika_bajt.seek(0)
-            await ctx.reply(file=discord.File(fp=slika_bajt, filename='captcha.png'))
+            await ctx.reply(
+                embed=embed,
+                file=discord.File(fp=slika_bajt, filename='captcha.png')
+            )
 
 
 class CaptchaChoice(discord.ui.View):
@@ -55,7 +64,7 @@ class CaptchaChoice(discord.ui.View):
     ) -> None:
         embed = discord.Embed(title='Image')
 
-        await interaction.message.edit(embed=embed, view=None)
+        await interaction.message.delete()
 
         self.value = 'image'
         self.stop()
