@@ -58,12 +58,15 @@ async def sync(ctx: Context) -> None:
     Sinhronizuje sve slash komande samo za server u kojem je upotrijebljena ova komanda.
     :return: None
     """
-    await client.tree.sync(guild=ctx.guild)
+    try:
+        await client.tree.sync(guild=ctx.guild)
+    except Exception as e:
+        print(e)
+
     embed = discord.Embed(
         description='Sinhronizovane slash komande za ovaj server.',
         color=discord.Colour.green()
     )
-
     await ctx.send(embed=embed)
 
 

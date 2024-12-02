@@ -100,6 +100,7 @@ class Captcha(commands.Cog, name='captcha'):
 
     @commands.hybrid_command(
         name='captcha',
+        with_app_command=True,
         description='Verifikuje korisnika i omogućava mu da koristi bota.'
     )
     @app_commands.describe(captcha_text='Tekst sa captcha slike.')

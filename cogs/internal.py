@@ -10,6 +10,7 @@ class Internal(commands.Cog, name="internal"):
 
     @commands.hybrid_command(
         name='reload',
+        with_app_command=True,
         description='Ponovo učitava Cog.'
     )
     @app_commands.describe(cog='Ime coga koji treba da se reloaduje.')
@@ -35,6 +36,7 @@ class Internal(commands.Cog, name="internal"):
 
     @commands.hybrid_command(
         name='load',
+        with_app_command=True,
         description='Učitava odabrani Cog.'
     )
     @app_commands.describe(cog='Ime coga koji treba da se učita.')

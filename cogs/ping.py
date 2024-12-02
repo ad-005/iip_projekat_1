@@ -8,6 +8,7 @@ class Ping(commands.Cog, name='ping'):
 
     @commands.hybrid_command(
         name='ping',
+        with_app_command=True,
         description="Pong...?"
     )
     async def ping(self, ctx: Context) -> None:
