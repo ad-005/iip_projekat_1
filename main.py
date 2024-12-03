@@ -59,7 +59,7 @@ async def sync(ctx: Context) -> None:
     :return: None
     """
     try:
-        await client.tree.sync(guild=ctx.guild)
+        await client.tree.sync(guild=discord.Object(id=ctx.guild.id))
     except Exception as e:
         print(e)
 

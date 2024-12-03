@@ -6,6 +6,7 @@ import string
 from PIL import Image
 from io import BytesIO
 from captcha.image import ImageCaptcha
+from captcha.audio import AudioCaptcha
 
 import discord
 from discord import app_commands
@@ -17,6 +18,7 @@ class ImageVerification:
     def __init__(self) -> None:
         super().__init__()
         self.captcha_text = ''
+        self.img_message = None
 
     async def generate_captcha(self, ctx: Context) -> None:
         """
@@ -47,10 +49,33 @@ class ImageVerification:
             slika.save(slika_bajt, 'PNG')
             slika_bajt.seek(0)
             embed.set_image(url='attachment://captcha.png')
-            await ctx.reply(
+            self.img_message = await ctx.reply(
                 embed=embed,
                 file=discord.File(fp=slika_bajt, filename='captcha.png')
             )
+
+
+class AudioVerification:
+    def __init__(self) -> None:
+        super().__init__()
+        self.audio_value = ''
+        self.audio_message = None
+
+    async def generate_audio_captcha(self, ctx: Context) -> None:
+        allowed_chars = string.digits
+        self.audio_value = ''.join(random.choice(allowed_chars) for _ in range(randrange(4, 8)))
+
+        audio_captcha = AudioCaptcha()
+        audio_data = audio_captcha.generate(self.audio_value)
+
+        embed = discord.Embed(
+            title='Captcha verifikacija',
+            description='Odgovorite tačnim sadržajem iz audio snimka.',
+            color=discord.Color.blurple(),
+            timestamp=datetime.datetime.now()
+        )
+
+        self.audio_message = await ctx.reply(embed=embed, file=discord.File(BytesIO(audio_data), filename='audio_captcha.wav'))
 
 
 # UI elementi za captcha komandu (biranje audio ili image captche)
@@ -119,6 +144,22 @@ class Captcha(commands.Cog, name='captcha'):
             await ctx.send(embed=embed)
             return
 
+        embed_success = discord.Embed(
+            title='Verifikacija uspješna',
+            description='Sada možete koristiti sve komande.',
+            color=discord.Color.teal(),
+            timestamp=datetime.datetime.now()
+        )
+
+        embed_failed = discord.Embed(
+            title='Verifikacija neuspješna',
+            description='Odgovor se ne podudara.'
+                        '\nPokušajte ponovo upotrebom komande `captcha`.',
+            color=discord.Color.red(),
+            timestamp=datetime.datetime.now()
+        )
+
+        verifikacija_audio = AudioVerification()
         verifikacija_slika = ImageVerification()
         buttons = CaptchaChoice()
         embed = discord.Embed(
@@ -136,30 +177,30 @@ class Captcha(commands.Cog, name='captcha'):
             user_response = await self.client.wait_for('message', check=lambda message: message.author == ctx.author)
 
             if user_response.content == verifikacija_slika.captcha_text:
-                embed = discord.Embed(
-                    title='Verifikacija uspješna',
-                    description='Sada možete koristiti sve komande.',
-                    color=discord.Color.teal(),
-                    timestamp=datetime.datetime.now()
-                )
-                await ctx.reply(embed=embed)
+                await ctx.reply(embed=embed_success)
                 await ctx.author.add_roles(
                     verified_role,
                     reason='Korisnik prošao captcha verifikaciju.'
                 )
-
             else:
-                embed = discord.Embed(
-                    title='Verifikacija neuspješna',
-                    description='Odgovor se ne podudara sa slikom.'
-                                '\nPokušajte ponovo upotrebom komande `captcha`.',
-                    color=discord.Color.red(),
-                    timestamp=datetime.datetime.now()
-                )
-                await ctx.reply(embed=embed)
+                await ctx.reply(embed=embed_failed)
+
+            await verifikacija_slika.img_message.delete()
 
         elif buttons.value == 'audio':
-            await ctx.send("Audio")
+            await verifikacija_audio.generate_audio_captcha(ctx)
+            user_response = await self.client.wait_for('message', check=lambda message: message.author == ctx.author)
+
+            if user_response.content == verifikacija_audio.audio_value:
+                await ctx.reply(embed=embed_success)
+                await ctx.author.add_roles(
+                    verified_role,
+                    reason='Korisnik prošao captcha verifikaciju.'
+                )
+            else:
+                await ctx.reply(embed=embed_failed)
+
+            await verifikacija_audio.audio_message.delete()
 
         else:
             pass
