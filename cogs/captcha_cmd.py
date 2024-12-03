@@ -121,6 +121,7 @@ class Captcha(commands.Cog, name='captcha'):
                         f'\nDa biste započeli verifikaciju, iskoristite komandu `captcha`.',
             color=discord.Color.blurple(),
         )
+        embed.set_footer(icon_url=member.avatar_url, text=f'Vrijeme ulaska na server: {datetime.datetime.now()}')
         await self.welcome_channel.send(embed=embed)
 
     @commands.hybrid_command(
@@ -169,7 +170,7 @@ class Captcha(commands.Cog, name='captcha'):
             timestamp=datetime.datetime.now()
         )
         embed.set_image(url='attachment://captcha.jpg')
-        bot_mssg = await ctx.reply(embed=embed, view=buttons)
+        await ctx.reply(embed=embed, view=buttons)
         await buttons.wait()
 
         if buttons.value == 'image':
@@ -204,7 +205,6 @@ class Captcha(commands.Cog, name='captcha'):
 
         else:
             pass
-
 
 
 async def setup(client) -> None:
