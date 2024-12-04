@@ -1,6 +1,7 @@
 import os
 from dotenv import load_dotenv
 import json
+import logging
 
 import discord
 from discord.ext import commands
@@ -9,6 +10,21 @@ from discord.ext.commands import Context
 with open("config.json") as file:
     config = json.load(file)
 
+# Setup za logovanje i formatiranje loga (izgled)
+logger = logging.getLogger("bot")
+logger.setLevel(logging.INFO)
+
+discord_logging = logging.FileHandler(filename="activities.log", encoding="utf-8", mode="w")
+discord_logging_formatter = logging.Formatter(
+    "[{asctime}] [{levelname}] {name}: {message}",
+    "%Y-%m-%d %H:%M:%S",
+    style="{"
+)
+
+discord_logging.setFormatter(discord_logging_formatter)
+logger.addHandler(discord_logging)
+
+
 class Client(commands.Bot):
     def __init__(self) -> None:
         super().__init__(
@@ -16,6 +32,7 @@ class Client(commands.Bot):
             intents=discord.Intents.all()
         )
         self.config = config
+        self.logger = logger
 
     async def on_ready(self) -> None:
         """
@@ -47,6 +64,14 @@ class Client(commands.Bot):
         :return: None
         """
         await self.change_presence(activity=discord.Game('😎'))
+
+    async def on_command_completion(self, ctx: Context) -> None:
+        """
+        Loguje svaku uspješno iskorišćenu komandu.
+        :return: None
+        """
+        command_name = ctx.command.name
+        self.logger.info(f"Komanda [{command_name}] je iskorišćena od strane {ctx.author}. (ID: {ctx.author.id})")
 
 
 client = Client()
