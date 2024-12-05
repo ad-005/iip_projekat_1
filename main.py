@@ -2,6 +2,7 @@ import os
 from dotenv import load_dotenv
 import json
 import logging
+import datetime
 
 import discord
 from discord.ext import commands
@@ -73,6 +74,33 @@ class Client(commands.Bot):
         command_name = ctx.command.name
         self.logger.info(f"Komanda [{command_name}] je iskorišćena od strane {ctx.author}. (ID: {ctx.author.id})")
 
+    async def on_command_error(self, ctx: Context, error: Exception) -> None:
+        """
+        Loguje neuspješno iskoričćene komande i error zbog kojeg nije radila.
+        :param error: Error do kojeg je došlo.
+        :return: None
+        """
+        error_embed = discord.Embed(
+            title='Došlo je do greške',
+            description='Došlo je do greške u izvršenju komande.\nMolim Vas pokušajte ponovo.',
+            color=discord.Color.red(),
+            timestamp=datetime.datetime.now()
+        )
+        command_name = ctx.command.name
+        self.logger.error(f"Komanda [{command_name}] error: {error}")
+
+        if isinstance(error, commands.MissingRole) and discord.utils.get(ctx.guild.roles, name='Verifikovan') not in ctx.author.roles:
+            role_embed = discord.Embed(
+                title='Niste verifikovani',
+                description='Ne posjedujete role potreban za izvršenje ove komande.'
+                            '\nMolim Vas verifikujte se komandom `captcha`.',
+                color=discord.Color.red(),
+                timestamp=datetime.datetime.now()
+            )
+            await ctx.send(embed=role_embed, delete_after=5.0)
+
+        else:
+            await ctx.send(embed=error_embed, delete_after=5.0)
 
 client = Client()
 

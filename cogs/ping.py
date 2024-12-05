@@ -1,3 +1,4 @@
+import discord
 from discord.ext import commands
 from discord.ext.commands import Context
 
@@ -11,6 +12,7 @@ class Ping(commands.Cog, name='ping'):
         with_app_command=True,
         description="Pong...?"
     )
+    @commands.has_role('Verifikovan')
     async def ping(self, ctx: Context) -> None:
         """
         Odgovara sa 'Pong' i vraca latency bota.
