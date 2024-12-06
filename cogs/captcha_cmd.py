@@ -108,8 +108,7 @@ class Captcha(commands.Cog, name='captcha'):
         self.client = client
         self.welcome_channel = self.client.get_channel(self.client.config["welcome_kanal"])
 
-    @commands.hybrid_command(name='welcome', description='not_important')
-    async def welcome(self, ctx: Context) -> None:
+    async def on_member_join(self, member) -> None:
         """
         Štampa poruku dobrodošlice u određenom kanalu kada se nova osoba pridruži.
         :param member: Osoba koja se pridružila serveru `discord.Member`.
@@ -117,7 +116,7 @@ class Captcha(commands.Cog, name='captcha'):
         """
         embed = discord.Embed(
             title='Dobrodošli!',
-            description=f'Dobrodošli na server {ctx.author.mention}!'
+            description=f'Dobrodošli na server {member.mention}!'
                         f'\nDa biste započeli verifikaciju, iskoristite komandu `captcha`.',
             color=discord.Color.blurple(),
             timestamp=datetime.datetime.now()
