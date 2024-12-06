@@ -1,3 +1,5 @@
+import logging
+
 import discord
 from discord import app_commands
 from discord.ext import commands
@@ -23,16 +25,15 @@ class Internal(commands.Cog, name="internal"):
         """
         try:
             await self.client.reload_extension(f'cogs.{cog}')
+            embed = discord.Embed(
+                description='Cog uspješno reloadovan.', colour=discord.Colour.green()
+            )
+            await ctx.send(embed=embed)
         except Exception as e:
             embed = discord.Embed(
                 description=str(e), colour=discord.Colour.red()
             )
-            await ctx.send(embed=embed)
-
-        embed = discord.Embed(
-            description='Cog uspješno reloadovan.', colour=discord.Colour.green()
-        )
-        await ctx.send(embed=embed)
+            await ctx.send(embed=embed, delete_after=5)
 
     @commands.hybrid_command(
         name='load',
@@ -55,10 +56,10 @@ class Internal(commands.Cog, name="internal"):
                 description=str(e),
                 colour=discord.Colour.red()
             )
-            await ctx.send(embed=embed)
+            await ctx.send(embed=embed, delete_after=5)
 
         embed = discord.Embed(description='Cog uspješno učitan.', colour=discord.Colour.green())
-        await ctx.send(embed=embed)
+        await ctx.send(embed=embed, delete_after=5)
 
     @commands.hybrid_command(
         name='unload',
@@ -79,10 +80,10 @@ class Internal(commands.Cog, name="internal"):
                                   description=str(e),
                                   colour=discord.Colour.red()
                                   )
-            await ctx.send(embed=embed)
+            await ctx.send(embed=embed, delete_after=5)
 
         embed = discord.Embed(description='Cog uspješno unloadovan.', colour=discord.Colour.green())
-        await ctx.send(embed=embed)
+        await ctx.send(embed=embed, delete_after=5)
 
 
 async def setup(client) -> None:

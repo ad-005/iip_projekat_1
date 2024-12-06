@@ -108,8 +108,8 @@ class Captcha(commands.Cog, name='captcha'):
         self.client = client
         self.welcome_channel = self.client.get_channel(self.client.config["welcome_kanal"])
 
-    @commands.Cog.listener()
-    async def on_member_join(self, member) -> None:
+    @commands.hybrid_command(name='welcome', description='not_important')
+    async def welcome(self, ctx: Context) -> None:
         """
         Štampa poruku dobrodošlice u određenom kanalu kada se nova osoba pridruži.
         :param member: Osoba koja se pridružila serveru `discord.Member`.
@@ -117,11 +117,11 @@ class Captcha(commands.Cog, name='captcha'):
         """
         embed = discord.Embed(
             title='Dobrodošli!',
-            description=f'Dobrodošli na server {member.mention}!'
+            description=f'Dobrodošli na server {ctx.author.mention}!'
                         f'\nDa biste započeli verifikaciju, iskoristite komandu `captcha`.',
             color=discord.Color.blurple(),
+            timestamp=datetime.datetime.now()
         )
-        embed.set_footer(icon_url=member.avatar_url, text=f'Vrijeme ulaska na server: {datetime.datetime.now()}')
         await self.welcome_channel.send(embed=embed)
 
     @commands.hybrid_command(
@@ -129,10 +129,10 @@ class Captcha(commands.Cog, name='captcha'):
         with_app_command=True,
         description='Verifikuje korisnika i omogućava mu da koristi bota.'
     )
-    @app_commands.describe(captcha_text='Tekst sa captcha slike.')
-    async def captcha(self, ctx: Context, captcha_text: str=None) -> None:
+    async def captcha(self, ctx: Context) -> None:
         """
-        :param captcha_text: Tekst sa slike koji se mora podudarati sa slikom.
+        Komanda pomoću koje se novi korisnik verifikuje. Bira između slike i audio captche,
+        tekst se mora podudarati.
         :return: None
         """
         verified_role = discord.utils.get(ctx.guild.roles, name='Verifikovan')
