@@ -62,6 +62,10 @@ class AudioVerification:
         self.audio_message = None
 
     async def generate_audio_captcha(self, ctx: Context) -> None:
+        """
+        Generiše i šalje .wav audio CAPTCH-u.
+        :return: None
+        """
         allowed_chars = string.digits
         self.audio_value = ''.join(random.choice(allowed_chars) for _ in range(randrange(4, 8)))
 
