@@ -11,7 +11,10 @@ Jednostavan Discord bot sa fokusom na captcha verifikaciju novih korisnika.
     ![alt](https://i.ibb.co/zx9J8gL/Discord-j6-Djf-BP8en.png)
     
 
-https://github.com/user-attachments/assets/eca891f6-a33d-4b9d-b9d4-3a55f9c07ddf
+
+
+https://github.com/user-attachments/assets/f631411e-f0de-4bbd-8248-325026950bdd
+
 
 
 ---
