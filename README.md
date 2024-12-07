@@ -9,6 +9,10 @@ Jednostavan Discord bot sa fokusom na captcha verifikaciju novih korisnika.
     ![alt](https://i.ibb.co/M9cTc40/Discord-gv59-Ab0-QCG.png)
 - #### Audio captcha
     ![alt](https://i.ibb.co/zx9J8gL/Discord-j6-Djf-BP8en.png)
+    
+
+https://github.com/user-attachments/assets/eca891f6-a33d-4b9d-b9d4-3a55f9c07ddf
+
 
 ---
 ### Podržava logovanje upotrebe komandi i errora pri upotrebi
