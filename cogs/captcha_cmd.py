@@ -9,7 +9,6 @@ from captcha.image import ImageCaptcha
 from captcha.audio import AudioCaptcha
 
 import discord
-from discord import app_commands
 from discord.ext import commands
 from discord.ext.commands import Context
 
