@@ -186,7 +186,7 @@ class Captcha(commands.Cog, name='captcha'):
                     reason='Korisnik prošao captcha verifikaciju.'
                 )
             else:
-                await ctx.reply(embed=embed_failed)
+                await ctx.reply(embed=embed_failed, delete_after=5)
 
             await verifikacija_slika.img_message.delete()
 
@@ -201,7 +201,7 @@ class Captcha(commands.Cog, name='captcha'):
                     reason='Korisnik prošao captcha verifikaciju.'
                 )
             else:
-                await ctx.reply(embed=embed_failed)
+                await ctx.reply(embed=embed_failed, delete_after=5)
 
             await verifikacija_audio.audio_message.delete()
 
